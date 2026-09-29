@@ -15,9 +15,9 @@ COPY insecure-db.tf /misconfiguration
 WORKDIR /usr/src/app
 
 RUN touch /tmp/ready
-COPY ./app/package*.json ./
+COPY --chown=node:node ./app/package*.json ./
 RUN npm install
-COPY ./app .
+COPY --chown=node:node ./app .
 
 EXPOSE 3000
 CMD ["npm", "start"]
