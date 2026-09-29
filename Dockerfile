@@ -1,20 +1,18 @@
-# FROM chainguard/node:latest
-FROM node:18-alpine
+# built as workshop-node-app:node-oss
+# FROM node:latest
 
-RUN mkdir /sensitive_data
+# built as workshop-node-app:node-cgr
+FROM cgr.dev/chainguard-private/node:latest
+
+# RUN mkdir /sensitive_data
 COPY iac-secrets.tf /sensitive_data
-RUN mkdir /misconfiguration
-
-# MALWARE BLOCK
-RUN echo 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*' > /eicar.com.txt
-RUN chmod +x ./eicar.com.txt
-# END OF MALWARE BLOCK
-
-COPY insecure-db.tf /misconfiguration
+# RUN mkdir /misconfiguration
 
 WORKDIR /usr/src/app
 
 RUN touch /tmp/ready
+# The Chainguard image runs as the non-root "node" user, so copied files must
+# be owned by it or npm install cannot write package-lock.json (EACCES).
 COPY --chown=node:node ./app/package*.json ./
 RUN npm install
 COPY --chown=node:node ./app .
